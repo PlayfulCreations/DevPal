@@ -1,0 +1,975 @@
+DevPal GitHub Repository Structure
+This artifact defines the complete file structure and content for the DevPal_project GitHub repository under github.com/PlayfulCreations/devpal. It includes a pre-built React frontend (merged with CodeSandbox), a Node.js backend, admin panel, and an automated installation script (install.sh) for a CodeCanyon-like deployment by UltraHost (~5 minutes). The repository is also set up for local testing in a Linux terminal.
+Repository Structure
+/DevPal_project
+├── /build
+│   ├── /frontend
+│   │   ├── index.html
+│   │   ├── /static
+│   │   │   ├── /css
+│   │   │   │   ├── App.css
+│   │   │   ├── /media
+│   │   │   │   ├── logo.png
+│   │   ├── /components
+│   │   │   ├── App.js
+│   │   │   │   ├── AdminPanel.jsx
+│   │   │   │   ├── Login.jsx
+│   │   │   │   ├── FeedbackForm.jsx
+│   │   │   │   └── CodeEditor.jsx
+│   ├── /backend
+│   │   ├── /routes
+│   │   │   ├── api.js
+│   │   │   ├── admin.js
+│   │   │   ├── auth.js
+│   │   │   ├── file_upload.js
+│   │   │   ├── feedback.js
+│   │   │   └── pages.js
+│   │   ├── /models
+│   │   │   ├── User.js
+│   │   ├── /uploads
+│   │   ├── server.js
+│   │   ├── package.json
+├── /.env
+├── .gitignore
+├── /docs
+│   ├── README.md
+│   ├── deploy.md
+├── install.sh
+├── LICENSE.txt
+├── package.json
+
+File Contents
+Frontend Files
+
+App.js (Merged with CodeSandbox):
+
+import React, { useState } from 'react';
+import { Link, BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import 'font-awesome/css/font-awesome.min.css';
+import './App.css';
+import AdminPanel from './AdminPanel.jsx';
+import Login from './Login.jsx';
+import FeedbackForm from './FeedbackForm.jsx';
+import CodeEditor from './CodeEditor.jsx';
+
+const App = () => {
+  const [isChatOpen, setIsChatOpen] = useState(true);
+  const [chatInput, setChatInput] = useState('');
+
+  const toggleChat = () => setIsChatOpen(!isChatOpen);
+
+  return (
+    <Router>
+      <div className="App bg-gray-50 font-sans">
+        {/* Navigation */}
+        <header className="App-header bg-white shadow-lg sticky top-0 z-50">
+          <div className="min-w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-16">
+              <div className="flex items-center">
+                <img src="/static/media/logo.png" className="App-logo-logo h-8 w-8" alt="logo" />
+                <span className="ml-2 text-xl font-bold text-gray-800">DevPal</span>
+                <div className="hidden md:ml-10 md:flex md:space-x-8">
+                  <Link to="/dashboard" className="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-2 border-b-2 text-sm font-medium">Dashboard</Link>
+                  <Link to="/chat" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">AI Chat</Link>
+                  <Link to="/docs" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Documentation</Link>
+                  <Link to="/blogs" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b">2 text-sm font-medium">Blogs</Link>
+                  <Link to="/coming-soon" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Coming Soon</Link>
+                  <Link to="/partners" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b">2 text-sm font-medium">Partners</Link>
+                  <Link to="/news" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">News</Link>
+                  <Link to="/shop" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Shop</Link>
+                  <Link to="/earnz" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Earnz</Link>
+                  <Link to="/admin/login" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Admin</Link>
+                </div>
+              </div>
+              <div className="hidden md:ml-4 md:flex md:items-center md:space-x-4">
+                <Link to="/login" className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Sign In</Link>
+                <Link to="/signup" className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition">Sign Up</Link>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Routes */}
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <Route path="/admin" component={AdminPanel} />
+          <Route path="/login" component={Login} />
+          <Route path="/feedback" component={FeedbackForm} />
+          <Route path="/code-editor" component={CodeEditor} />
+          <Route path="/blogs" render={() => <div dangerouslySetInnerHTML={{ __html: pages.find(p => p.slug === 'blogs')?.content }} />} />
+          <Route path="/coming-soon" render={() => <div dangerouslySetInnerHTML={{ __html: pages.find(p => p.slug === 'coming-soon')?.content }} />} />
+          <Route path="/partners" render={() => <div dangerouslySetInnerHTML={{ __html: pages.find(p => p.slug === 'partners')?.content }} />} />
+          <Route path="/news" render={() => <div dangerouslySetInnerHTML={{ __html: pages.find(p => p.slug === 'news')?.content }} />} />
+          <Route path="/shop" render={() => <div dangerouslySetInnerHTML={{ __html: pages.find(p => p.slug === 'shop')?.content }} />} />
+          <Route path="/earnz" render={() => <div dangerouslySetInnerHTML={{ __html: pages.find(p => p.slug === 'earnz')?.content }} />} />
+          <Route path="/privacy" render={() => <div dangerouslySetInnerHTML={{ __html: pages.find(p => p.slug === 'privacy')?.content }} />} />
+          <Route path="/terms" render={() => <div dangerouslySetInnerHTML={{ __html: pages.find(p => p.slug === 'terms')?.content }} />} />
+          <Route path="/cookie-policy" render={() => <div dangerouslySetInnerHTML={{ __html: pages.find(p => p.slug === 'cookie-policy')?.content }} />} />
+        </Switch>
+
+        {/* Hero Section */}
+        <section className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-20">
+          <div className="min-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-center">Welcome to DevPal</h1>
+            <p className="text-xl mb-8 text-center">Your AI-powered developer workspace by NX Solutions.</p>
+            <div className="flex justify-center space-x-4">
+              <Link to="/signup" className="bg-white text-indigo-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition">Get Started</Link>
+              <Link to="/docs" className="border border-white text-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:text-indigo-600 transition">Learn More</Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section className="py-20 bg-white">
+          <div className="min-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">Pricing Plans</h2>
+            <p className="text-xl text-gray-600 mb-8 text-center">Choose a plan or join our Earnz program for rewards!</p>
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                { name: 'Basic', price: 'TBD', desc: 'For individual developers.', features: ['AI Chat', 'Terminal', 'Basic Support'] },
+                { name: 'Pro', price: 'TBD', desc: 'For teams.', features: ['All Basic Features', 'Collaboration', 'Priority Support'] },
+                { name: 'Enterprise', price: 'TBD', desc: 'For organizations.', features: ['All Pro Features', 'Custom Integrations', 'Dedicated Support'] },
+              ].map((plan, index) => (
+                <div key={index} className="bg-gray-50 rounded-xl p-6 hover:-translate-y-1 hover:shadow-lg transition duration-300">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                  <p className="text-2xl font-semibold text-indigo-600 mb-4">{plan.price}</p>
+                  <p className="text-gray-600 mb-4">{plan.desc}</p>
+                  <ul className="space-y-2 mb-6">
+                    {plan.features.map((feature, i) => (
+                      <li key={i} className="flex items-center">
+                        <i className="fa fa-check text-green-500 mr-2"></i>
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link to="/signup" className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-3 rounded-lg font-medium text-center hover:opacity-90 transition">Choose Plan</Link>
+                </div>
+              ))}
+            </div>
+            <div className="mt-8 text-center">
+              <p className="text-gray-600">Special Promotion: Early access benefits available!</p>
+              <Link to="/earnz" className="text-indigo-600 underline">Explore Earnz</Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="bg-gray-900 text-gray-400 py-12">
+          <div className="min-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              {[
+                { title: 'Product', links: ['Features', 'Documentation', 'Releases'] },
+                { title: 'Company', links: ['About', 'Blog', 'Careers'] },
+                { title: 'Support', links: ['Help Center', 'Community', 'Contact Us'] },
+                { title: 'Legal', links: ['Privacy', 'Terms', 'Cookie Policy'] },
+              ].map((section, index) => (
+                <div key={index}>
+                  <h3 className="text-white text-lg font-medium mb-4">{section.title}</h3>
+                  <ul className="space-y-2">
+                    {section.links.map((link, i) => (
+                      <li key={i}><Link to={`/${link.toLowerCase().replace(' ', '-')}`} className="hover:text-white transition">{link}</Link></li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+            <div className="mt-12 pt-8 border-t border-gray-800 text-center">
+              <p>© 2025 NX Solutions - DevPal. All rights reserved.</p>
+              <p>Powered by NX Solutions - DevPal</p>
+            </div>
+          </div>
+        </footer>
+
+        {/* AI Chat Widget */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <button onClick={toggleChat} className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:shadow-xl transition">
+            <i className="fa fa-comment-dots text-2xl"></i>
+          </button>
+          {isChatOpen && (
+            <div className="absolute bottom-20 right-0 w-80 bg-white rounded-lg shadow-xl overflow-hidden">
+              <div className="bg-gray-800 text-white p-3 flex items-center">
+                <h3 className="font-medium">DevPal Assistant</h3>
+                <button onClick={toggleChat} className="ml-auto text-gray-300 hover:text-white"><i className="fa fa-times"></i></button>
+              </div>
+              <div className="h-64 p-4 overflow-y-auto bg-gray-50">
+                <p className="text-sm">Hi! How can I assist with your coding?</p>
+              </div>
+              <div className="p-3 border-t border-gray-200">
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Ask about coding..."
+                  className="w-full px-3 py-2 border rounded"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </Router>
+  );
+};
+
+const Home = () => (
+  <div>
+    {/* Home page content is already included in App.js (hero, pricing, footer) */}
+  </div>
+);
+
+export default App;
+
+
+App.css (From CodeSandbox):
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+index.html:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DevPal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+</head>
+<body>
+  <div id="root"></div>
+  <script src="/static/js/main.js"></script>
+</body>
+</html>
+
+
+AdminPanel.jsx:
+
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import Editor from 'react-simple-wysiwyg';
+import { Link } from 'react-router-dom';
+
+const AdminPanel = () => {
+  const [users, setUsers] = useState([]);
+  const [theme, setTheme] = useState('light');
+  const [menuLinks, setMenuLinks] = useState(['Dashboard', 'AI Chat', 'Documentation', 'Blogs', 'Coming Soon', 'Partners', 'News', 'Shop', 'Earnz', 'Admin']);
+  const [newLink, setNewLink] = useState('');
+  const [logo, setLogo] = useState(null);
+  const [favicon, setFavicon] = useState(null);
+  const [apiKey, setApiKey] = useState('');
+  const [pages, setPages] = useState([]);
+  const [selectedPage, setSelectedPage] = useState('');
+  const [pageContent, setPageContent] = useState('');
+  const [media, setMedia] = useState([]);
+  const [features, setFeatures] = useState({
+    chat: true,
+    terminal: true,
+    pricing: true,
+    blogs: true,
+  });
+  const [serverStatus, setServerStatus] = useState({ cpu: 0, memory: 0, uptime: 0 });
+
+  useEffect(() => {
+    axios.get('/admin/users', { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
+      .then(res => setUsers(res.data.users))
+      .catch(err => console.error(err));
+    axios.get('/admin/pages')
+      .then(res => setPages(res.data.pages))
+      .catch(err => console.error(err));
+    axios.get('/admin/media')
+      .then(res => setMedia(res.data.media))
+      .catch(err => console.error(err));
+    setServerStatus({ cpu: 25, memory: 60, uptime: 3600 });
+  }, []);
+
+  const saveTheme = () => {
+    document.documentElement.className = theme;
+    axios.post('/admin/theme', { theme });
+    alert(`Theme set to ${theme}`);
+  };
+
+  const addMenuLink = () => {
+    if (newLink) {
+      setMenuLinks([...menuLinks, newLink]);
+      axios.post('/admin/menu', { link: newLink });
+      setNewLink('');
+    }
+  };
+
+  const uploadLogo = () => {
+    const formData = new FormData();
+    formData.append('logo', logo);
+    axios.post('/admin/logo', formData);
+    alert('Logo uploaded');
+  };
+
+  const uploadFavicon = () => {
+    const formData = new FormData();
+    formData.append('favicon', favicon);
+    axios.post('/admin/favicon', formData);
+    alert('Favicon uploaded');
+  };
+
+  const saveApiKey = () => {
+    axios.post('/admin/api-key', { apiKey });
+    alert('Grok API key saved');
+  };
+
+  const savePage = () => {
+    axios.post('/admin/pages', { slug: selectedPage, content: pageContent });
+    alert('Page saved');
+  };
+
+  const uploadMedia = (file) => {
+    const formData = new FormData();
+    formData.append('media', file);
+    axios.post('/admin/media', formData)
+      .then(res => setMedia([...media, res.data.file]));
+  };
+
+  const toggleFeature = (feature) => {
+    setFeatures({ ...features, [feature]: !features[feature] });
+    axios.post('/admin/features', { feature, enabled: !features[feature] });
+  };
+
+  return (
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <h1 className="text-2xl font-bold mb-6">Admin Panel</h1>
+
+      {/* Quick Access Buttons */}
+      <div className="mb-6 flex space-x-4">
+        <Link to="/admin" className="p-2 bg-blue-600 text-white rounded">Admin Panel</Link>
+        <Link to="/dashboard" className="p-2 bg-green-600 text-white rounded">User Dashboard</Link>
+      </div>
+
+      {/* User Management */}
+      <div className="bg-white p-4 shadow rounded mb-6">
+        <h2 className="text-lg font-semibold mb-4">Manage Users</h2>
+        <ul>
+          {users.map(user => (
+            <li key={user.id} className="py-2">{user.username} ({user.role})</li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Branding */}
+      <div className="bg-white p-4 shadow rounded mb-6">
+        <h2 className="text-lg font-semibold mb-4">Branding</h2>
+        <div className="mb-4">
+          <label className="block text-sm font-medium">Logo Upload</label>
+          <input type="file" onChange={(e) => setLogo(e.target.files[0])} className="p-2 border rounded w-full" />
+          <button onClick={uploadLogo} className="mt-2 p-2 bg-blue-600 text-white rounded">Upload Logo</button>
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Favicon Upload</label>
+          <input type="file" onChange={(e) => setFavicon(e.target.files[0])} className="p-2 border rounded w-full" />
+          <button onClick={uploadFavicon} className="mt-2 p-2 bg-blue-600 text-white rounded">Upload Favicon</button>
+        </div>
+      </div>
+
+      {/* API Key Management */}
+      <div className="bg-white p-4 shadow rounded mb-6">
+        <h2 className="text-lg font-semibold mb-4">Grok API Key</h2>
+        <input
+          type="text"
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value)}
+          placeholder="Enter Grok API key"
+          className="p-2 border rounded w-full mb-2"
+        />
+        <button onClick={saveApiKey} className="p-2 bg-blue-600 text-white rounded">Save API Key</button>
+      </div>
+
+      {/* Page Editor */}
+      <div className="bg-white p-4 shadow rounded mb-6">
+        <h2 className="text-lg font-semibold mb-4">Page Editor</h2>
+        <select
+          value={selectedPage}
+          onChange={(e) => {
+            setSelectedPage(e.target.value);
+            const page = pages.find(p => p.slug === e.target.value);
+            setPageContent(page ? page.content : '');
+          }}
+          className="p-2 border rounded w-full mb-2"
+        >
+          <option value="">Select a page</option>
+          {['blogs', 'coming-soon', 'partners', 'news', 'shop', 'earnz', 'privacy', 'terms', 'cookie-policy'].map(slug => (
+            <option key={slug} value={slug}>{slug.replace('-', ' ').toUpperCase()}</option>
+          ))}
+        </select>
+        <Editor value={pageContent} onChange={(e) => setPageContent(e.target.value)} />
+        <button onClick={savePage} className="mt-2 p-2 bg-blue-600 text-white rounded">Save Page</button>
+      </div>
+
+      {/* Menu Customization */}
+      <div className="bg-white p-4 shadow rounded mb-6">
+        <h2 className="text-lg font-semibold mb-4">Menu Customization</h2>
+        <input
+          type="text"
+          value={newLink}
+          onChange={(e) => setNewLink(e.target.value)}
+          placeholder="Add new link (e.g., Blog)"
+          className="p-2 border rounded w-full mb-2"
+        />
+        <button onClick={addMenuLink} className="p-2 bg-blue-600 text-white rounded">Add Link</button>
+        <ul className="mt-2">
+          {menuLinks.map((link, index) => (
+            <li key={index} className="py-1">{link}</li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Media Center */}
+      <div className="bg-white p-4 shadow rounded mb-6">
+        <h2 className="text-lg font-semibold mb-4">Media Center</h2>
+        <input type="file" onChange={(e) => uploadMedia(e.target.files[0])} className="p-2 border rounded w-full mb-2" />
+        <ul className="grid grid-cols-3 gap-4">
+          {media.map((file, index) => (
+            <li key={index} className="p-2 border rounded">
+              <img src={`/media/${file}`} alt={file} className="w-full h-24 object-cover" />
+              <p className="text-sm truncate">{file}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Feature Toggles */}
+      <div className="bg-white p-4 shadow rounded mb-6">
+        <h2 className="text-lg font-semibold mb-4">Feature Toggles</h2>
+        {Object.keys(features).map(feature => (
+          <div key={feature} className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              checked={features[feature]}
+              onChange={() => toggleFeature(feature)}
+              className="mr-2"
+            />
+            <span>{feature.toUpperCase()}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Hosting/Server Management */}
+      <div className="bg-white p-4 shadow rounded">
+        <h2 className="text-lg font-semibold mb-4">Hosting & Server Management</h2>
+        <div className="grid grid-cols-3 gap-4 mb-4">
+          <div>
+            <p className="text-sm font-medium">CPU Usage</p>
+            <p>{serverStatus.cpu}%</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium">Memory Usage</p>
+            <p>{serverStatus.memory}%</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium">Uptime</p>
+            <p>{Math.floor(serverStatus.uptime / 3600)} hours</p>
+          </div>
+        </div>
+        <div>
+          <h3 className="text-sm font-medium mb-2">Server Actions</h3>
+          <button className="p-2 bg-green-600 text-white rounded mr-2">Restart Server</button>
+          <button className="p-2 bg-red-600 text-white rounded">Stop Server</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminPanel;
+
+
+Login.jsx (Basic admin login component):
+
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useHistory } from 'react-router-dom';
+
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const history = useHistory();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post('/auth/login', { email, password });
+      localStorage.setItem('token', res.data.token);
+      if (res.data.role === 'admin') {
+        history.push('/admin');
+      } else {
+        history.push('/dashboard');
+      }
+    } catch (err) {
+      setError('Invalid credentials');
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+        <form onSubmit={handleLogin}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-2 border rounded"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 border rounded"
+              required
+            />
+          </div>
+          <button type="submit" className="w-full p-2 bg-blue-600 text-white rounded">Login</button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
+
+
+FeedbackForm.jsx (Simple feedback form):
+
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const FeedbackForm = () => {
+  const [feedback, setFeedback] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('/feedback/submit', { feedback });
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Feedback submission failed');
+    }
+  };
+
+  if (submitted) {
+    return <div className="p-6 text-center">Thank you for your feedback!</div>;
+  }
+
+  return (
+    <div className="p-6 max-w-md mx-auto">
+      <h2 className="text-2xl font-bold mb-4">Feedback</h2>
+      <form onSubmit={handleSubmit}>
+        <textarea
+          value={feedback}
+          onChange={(e) => setFeedback(e.target.value)}
+          placeholder="Share your feedback..."
+          className="w-full p-2 border rounded mb-4"
+          rows="5"
+          required
+        />
+        <button type="submit" className="p-2 bg-blue-600 text-white rounded">Submit</button>
+      </form>
+    </div>
+  );
+};
+
+export default FeedbackForm;
+
+
+CodeEditor.jsx (Placeholder for AI-powered code editor):
+
+import React, { useState } from 'react';
+
+const CodeEditor = () => {
+  const [code, setCode] = useState('// Write your code here');
+
+  return (
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Code Editor</h2>
+      <textarea
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        className="w-full p-2 border rounded font-mono"
+        rows="10"
+      />
+      <button className="mt-2 p-2 bg-blue-600 text-white rounded">Run Code</button>
+    </div>
+  );
+};
+
+export default CodeEditor;
+
+Backend Files
+
+server.js:
+
+const express = require('express');
+const apiRoutes = require('./routes/api');
+const adminRoutes = require('./routes/admin');
+const authRoutes = require('./routes/auth');
+const fileUploadRoutes = require('./routes/file_upload');
+const feedbackRoutes = require('./routes/feedback');
+const pageRoutes = require('./routes/pages');
+const path = require('path');
+require('dotenv').config();
+
+const app = express();
+app.use(express.json());
+app.use('/api', apiRoutes);
+app.use('/admin', adminRoutes);
+app.use('/auth', authRoutes);
+app.use('/upload', fileUploadRoutes);
+app.use('/feedback', feedbackRoutes);
+app.use('/pages', pageRoutes);
+app.use(express.static(path.join(__dirname, '../../build/frontend')));
+
+app.listen(3001, () => console.log('Backend running on port 3001'));
+
+
+package.json (Backend):
+
+{
+  "name": "devpal-backend",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "dotenv": "^10.0.0",
+    "multer": "^1.4.3"
+  }
+}
+
+
+pages.js:
+
+const express = require('express');
+const router = express.Router();
+
+let pages = [
+  { slug: 'blogs', content: '<h1>Blogs</h1><p>Welcome to our blog, sharing insights on AI and coding.</p>' },
+  { slug: 'coming-soon', content: '<h1>Coming Soon</h1><p>Exciting features like advanced AI tools and integrations are on the way!</p>' },
+  { slug: 'partners', content: '<h1>Partners</h1><p>Join our partnership program to collaborate with NX Solutions.</p>' },
+  { slug: 'news', content: '<h1>News</h1><p>Stay updated with the latest DevPal developments.</p>' },
+  { slug: 'shop', content: '<h1>Shop</h1><p>Purchase premium tools and services.</p>' },
+  { slug: 'earnz', content: '<h1>Earnz</h1><p>Earn rewards through our affiliate program.</p>' },
+  { slug: 'privacy', content: '<h1>Privacy Policy</h1><p>Your data is secure with us.</p>' },
+  { slug: 'terms', content: '<h1>Terms of Service</h1><p>Read our terms for using DevPal.</p>' },
+  { slug: 'cookie-policy', content: '<h1>Cookie Policy</h1><p>We use cookies to enhance your experience.</p>' },
+];
+
+router.get('/', (req, res) => res.json({ pages }));
+router.post('/', (req, res) => {
+  const { slug, content } = req.body;
+  const index = pages.findIndex(p => p.slug === slug);
+  if (index !== -1) {
+    pages[index].content = content;
+  } else {
+    pages.push({ slug, content });
+  }
+  res.json({ message: 'Page saved' });
+});
+
+module.exports = router;
+
+
+auth.js:
+
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const router = express.Router();
+
+const adminCredentials = { email: 'admin@devpal.com', password: 'password123', role: 'admin' };
+const users = [{ id: 1, email: 'admin@devpal.com', role: 'admin' }];
+
+router.post('/login', (req, res) => {
+  const { email, password } = req.body;
+  if (email === adminCredentials.email && password === adminCredentials.password) {
+    const token = jwt.sign({ email, role: 'admin' }, process.env.SECRET_KEY);
+    return res.json({ token, role: 'admin' });
+  }
+  const user = users.find(u => u.email === email);
+  if (user) {
+    const token = jwt.sign({ email, role: 'user' }, process.env.SECRET_KEY);
+    return res.json({ token, role: 'user' });
+  }
+  res.status(401).json({ error: 'Invalid credentials' });
+});
+
+module.exports = router;
+
+
+api.js (Placeholder):
+
+const express = require('express');
+const router = express.Router();
+
+router.get('/grok', (req, res) => {
+  res.json({ message: 'Grok API integration placeholder' });
+});
+
+module.exports = router;
+
+
+admin.js (Placeholder):
+
+const express = require('express');
+const router = express.Router();
+
+router.get('/users', (req, res) => {
+  res.json({ users: [{ id: 1, username: 'admin', role: 'admin' }] });
+});
+
+router.post('/theme', (req, res) => {
+  res.json({ message: 'Theme updated' });
+});
+
+router.post('/menu', (req, res) => {
+  res.json({ message: 'Menu link added' });
+});
+
+router.post('/logo', (req, res) => {
+  res.json({ message: 'Logo uploaded' });
+});
+
+router.post('/favicon', (req, res) => {
+  res.json({ message: 'Favicon uploaded' });
+});
+
+router.post('/api-key', (req, res) => {
+  res.json({ message: 'API key saved' });
+});
+
+router.get('/media', (req, res) => {
+  res.json({ media: [] });
+});
+
+router.post('/media', (req, res) => {
+  res.json({ file: 'media.jpg' });
+});
+
+router.post('/features', (req, res) => {
+  res.json({ message: 'Feature toggled' });
+});
+
+module.exports = router;
+
+
+file_upload.js (Placeholder):
+
+const express = require('express');
+const multer = require('multer');
+const router = express.Router();
+const upload = multer({ dest: 'uploads/' });
+
+router.post('/upload', upload.single('file'), (req, res) => {
+  res.json({ message: 'File uploaded', file: req.file.filename });
+});
+
+module.exports = router;
+
+
+feedback.js (Placeholder):
+
+const express = require('express');
+const router = express.Router();
+
+router.post('/submit', (req, res) => {
+  res.json({ message: 'Feedback submitted' });
+});
+
+module.exports = router;
+
+
+User.js (Placeholder model):
+
+const users = [
+  { id: 1, email: 'admin@devpal.com', role: 'admin' }
+];
+
+module.exports = users;
+
+Deployment Files
+
+install.sh:
+
+#!/bin/bash
+# DevPal Installation Script for UltraHost
+echo "Starting DevPal installation..."
+
+# Check for Node.js
+if ! command -v node &> /dev/null; then
+    echo "Error: Node.js is required. Please ask UltraHost to install Node.js v18+."
+    exit 1
+fi
+
+# Install backend dependencies
+cd backend
+npm install --no-package-lock
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to install backend dependencies."
+    exit 1
+fi
+
+# Start backend server with PM2
+npm install -g pm2
+pm2 start server.js --name devpal-backend
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to start backend server."
+    exit 1
+fi
+
+# Serve frontend
+echo "Frontend build is pre-packaged in /build/frontend."
+echo "Please configure UltraHost to serve /build/frontend as a static site on port 80 or 443 (with SSL)."
+
+# Configure environment
+if [ ! -f .env ]; then
+    echo "Creating .env file..."
+    echo "SECRET_KEY=mysecret123" > ../.env
+    echo "GROK_API_KEY=your_grok_api_key_here" >> ../.env
+fi
+
+echo "Installation complete! Access DevPal at your domain."
+echo "Next steps: Add your Grok API key to /DevPal_project/.env and configure SSL with UltraHost."
+
+
+.env:
+
+SECRET_KEY=mysecret123
+GROK_API_KEY=your_grok_api_key_here
+
+
+deploy.md:
+
+# DevPal Deployment Guide for UltraHost
+
+## Prerequisites
+- UltraHost account with Node.js v18+ support.
+- Domain name.
+- Grok API key (https://x.ai/api).
+
+## Deployment Steps
+1. **Clone Repository**:
+   - Clone from: https://github.com/PlayfulCreations/devpal
+   - Run: `git clone https://github.com/PlayfulCreations/devpal.git DevPal_project`
+   - Zip the folder: `zip -r DevPal_project.zip DevPal_project`
+2. **Extract Zip**:
+   - Upload `DevPal_project.zip` to UltraHost via file manager or FTP.
+   - Extract to `/var/www/devpal`.
+3. **Run Installation Script**:
+   - Navigate to `/var/www/devpal` via SSH or control panel.
+   - Run: `bash install.sh`
+4. **Configure Environment**:
+   - Open `/var/www/devpal/.env`.
+   - Set:
+     ```
+     SECRET_KEY=mysecret123
+     GROK_API_KEY=[Your Grok API Key]
+     ```
+5. **Set Up Web Server**:
+   - Serve `/var/www/devpal/build/frontend` on port 80/443 (use Let’s Encrypt for SSL).
+   - Open port 3001 for the backend.
+6. **Test**:
+   - Visit `yourdomain.com`.
+   - Log in at `yourdomain.com/admin/login` (Email: `admin@devpal.com`, Password: `password123`).
+
+## Troubleshooting
+- If Node.js is unsupported, contact UltraHost support.
+- Check `/var/www/devpal/backend/server.log` for errors.
+- Contact [Your Email] for assistance.
+
+
+README.md:
+
+# DevPal
+
+DevPal is an AI-powered developer workspace by NX Solutions, offering AI chat, code generation, and a customizable platform for blogs, affiliate programs (Earnz), and more.
+
+## Installation
+See `docs/deploy.md` for UltraHost deployment instructions.
+
+## Features
+- AI-powered chat and code generation.
+- Customizable pages (Blogs, Earnz, Partners, News, Shop).
+- Admin panel with WYSIWYG editor, media center, and API key management.
+- Single admin account with distinct login flows.
+- Footer with © 2025 NX Solutions - DevPal.
+
+## License
+Proprietary. See `LICENSE.txt`.
+
+
+LICENSE.txt:
+
+Proprietary License for DevPal by NX Solutions
+© 2025 NX Solutions. All rights reserved.
+
+
+.gitignore:
+
+node_modules
+.env
+uploads
+
+
+logo.png:
+
+
+Download from your CodeSandbox (https://codesandbox.io/p/sandbox/qs6r3y, under public/logo192.png).
+Rename to logo.png and place in /build/frontend/static/media.
+
+Notes
+
+node_modules: Excluded to keep the repository lightweight. The install.sh script runs npm install for UltraHost.
+Placeholder Files: api.js, admin.js, file_upload.js, feedback.js, User.js are stubs. Let me know if you need full implementations.
+Frontend Build: The /build/frontend folder is assumed to be pre-built. For local testing, you’ll need to build it (instructions below).
